@@ -1,15 +1,24 @@
 // remoteModules.js — dynamic module loader for AO3 Helper (CSP-safe)
-;(function(){
+;(function () {
   'use strict';
 
-  const W  = (typeof unsafeWindow !== 'undefined') ? unsafeWindow : window;
+  const W = (typeof unsafeWindow !== 'undefined') ? unsafeWindow : window;
   const AO3H = W.AO3H = W.AO3H || {};
   const NS = (AO3H.env && AO3H.env.NS) || 'ao3h';
 
-  // --- Manifest location in your public GitHub repo ---
+  // --- Garde le même manifest que dans ton repo actuel ---
   const MANIFEST_URL = 'https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/ao3h-manifest.json';
 
-  // ---- Robust GET that works in Tampermonkey sandbox across origins ----
+  // ---------------------------- Utils ----------------------------
+  function isCssUrl(u) {
+    try { const url = new URL(u, location.href); return url.pathname.toLowerCase().endsWith('.css'); }
+    catch { return /\.css(\?.*)?$/i.test(u); }
+  }
+  function isJsUrl(u) {
+    try { const url = new URL(u, location.href); return url.pathname.toLowerCase().endsWith('.js'); }
+    catch { return /\.js(\?.*)?$/i.test(u); }
+  }
+
   function getText(url) {
     return new Promise((resolve, reject) => {
       if (typeof GM_xmlhttpRequest === 'function') {
@@ -31,34 +40,34 @@
     });
   }
 
-  // ---- Evaluate JS code text in userscript sandbox (ordered) ----
-  async function evalScriptFrom(url) {
-    const code = await getText(url);
-    // help debugging: make the code show up with a virtual filename
+  function evalJsFrom(url, code) {
     const wrapped = `${code}\n//# sourceURL=${url}`;
-    // Use Function over eval to avoid scoping surprises
     // eslint-disable-next-line no-new-func
-    const fn = new Function(wrapped);
-    fn();
-    return url;
+    new Function(wrapped)();
   }
 
-  // Minimal storage facade (uses your AO3H.store if present)
+  function injectCss(cssText) {
+    if (typeof GM_addStyle === 'function') {
+      GM_addStyle(cssText);
+    } else {
+      const style = document.createElement('style');
+      style.textContent = cssText;
+      (document.head || document.documentElement).appendChild(style);
+    }
+  }
+
   const Store = AO3H.store || {
     get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
     set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
   };
 
-  // One-time migrations per manifest version (optional hook)
   async function runMigrationsIfNeeded(manifest) {
     const KEY = `${NS}:manifestVersion`;
     const prev = Store.get(KEY, null);
     const curr = manifest.version || '0.0.0';
     if (prev === curr) return;
-
     try {
-      // Example:
-      // if (prev && prev < '1.1.0') { /* rename some storage keys safely here */ }
+      // Placeholders de migration si besoin
       Store.set(KEY, curr);
       console.log(`[AO3H] Migrations checked for version ${curr}`);
     } catch (err) {
@@ -71,6 +80,8 @@
     return JSON.parse(text);
   }
 
+  // Charge dans l’ordre : core → menu → modules (comme avant).
+  // Accepte JS et CSS dans n’importe quel groupe.
   async function loadFromManifest(manifest) {
     const list = [];
     if (manifest.core?.length)    list.push(...manifest.core);
@@ -80,7 +91,25 @@
     const v = encodeURIComponent(manifest.version || '');
     for (const baseUrl of list) {
       const url = v ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}v=${v}` : baseUrl;
-      await evalScriptFrom(url); // ordered, one by one
+      try {
+        if (isCssUrl(url)) {
+          console.log('[AO3H] CSS  →', url);
+          const css = await getText(url);
+          injectCss(css);
+        } else if (isJsUrl(url)) {
+          console.log('[AO3H] JS   →', url);
+          const js = await getText(url);
+          evalJsFrom(url, js);
+        } else {
+          // Si l’extension est inconnue, on tente JS puis fallback CSS
+          console.log('[AO3H] ?JS →', url);
+          const txt = await getText(url);
+          try { evalJsFrom(url, txt); }
+          catch (e) { console.warn('[AO3H] Fallback CSS for', url, e); injectCss(txt); }
+        }
+      } catch (e) {
+        console.error('[AO3H] Error loading', url, e);
+      }
     }
   }
 
@@ -102,7 +131,5 @@
     }
   }
 
-  // Start
   boot();
 })();
-
