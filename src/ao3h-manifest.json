@@ -1,16 +1,16 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "core": [
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/runtime/prelude.js",
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/runtime/core.js",
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/styles/base.css"
   ],
   "menu": [
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/menu/menu.css",
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/menu/menu.js"
+    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/menu/menu.js",
+    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/menu/menu-grouper.js"
   ],
   "modules": [
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/modules/bookmarkStatus.js",
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/modules/markedForLaterStatus.js"
   ]
 }
+
