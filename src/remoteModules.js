@@ -7,7 +7,7 @@
   const NS = (AO3H.env && AO3H.env.NS) || 'ao3h';
 
   // --- Manifest location in your public GitHub repo ---
-  const MANIFEST_URL = 'https://raw.githubusercontent.com/hellersqueen/ao3_helper/main/ao3h-manifest.json';
+  const MANIFEST_URL = 'https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/ao3h-manifest.json';
 
   // ---- Robust GET that works in Tampermonkey sandbox across origins ----
   function getText(url) {
@@ -105,3 +105,4 @@
   // Start
   boot();
 })();
+
