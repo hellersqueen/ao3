@@ -1,7 +1,7 @@
 {
   "version": "1.0.4",
   "core": [
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/runtime/core.js",
+    "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/runtime/core.js"
   ],
   "menu": [
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/menu/menu.css",
@@ -13,4 +13,3 @@
     "https://raw.githubusercontent.com/hellersqueen/ao3/main/src/modules/markedForLaterStatus.js"
   ]
 }
-
