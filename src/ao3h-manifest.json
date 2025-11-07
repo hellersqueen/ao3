@@ -1,14 +1,15 @@
 {
   "version": "1.0.3",
   "core": [
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/core.js"
+    "https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/runtime/core.js"
   ],
   "menu": [
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/menu.js",
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/menu-grouper.js"
+    "https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/styles/menu.css",
+    "https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/runtime/menu/menu.js",
+    "https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/runtime/menu/menu-grouper.js"
   ],
   "modules": [
-    "https://raw.githubusercontent.com/hellersqueen/ao3/main/modules/autoSearchFilters.js"
+    "https://raw.githubusercontent.com/hellersqueen/ao3/refs/heads/main/src/modules/demoBadge/index.js"
   ]
 }
 
